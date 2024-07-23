@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
-const port =  process.env.PORT || 3000;
+const port = const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
@@ -37,7 +37,7 @@ app.get('/latest-data', (req, res) => {
     res.json(responseData); // Return the latest received data as JSON
 });
 
-// Start the server to listen on all available network interfaces
-app.listen(port, '0.0.0.0', () => {
-    console.log(`Server running at http://0.0.0.0:${port}`);
+// Start the server to listen on the specified port
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
 });
