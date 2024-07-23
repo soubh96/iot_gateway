@@ -1,0 +1,20 @@
+curl -X POST http://localhost:3000/receive-data^
+-H "Content-Type: application/json"^
+-d '{
+  "temperature": 25.5,
+  "moisture": 60.2
+}'
+
+
+curl -X POST http://localhost:3000/receive-data^
+-H "Content-Type: application/json"^
+-d '{
+  "temperature": 25.5,
+  "moisture": 60.2
+}'
+
+
+
+curl -X POST http://localhost:3000/receive-data ^
+-H "Content-Type: application/json" ^
+-d "{\"temperature\": 25.5, \"moisture\": 70.5}"

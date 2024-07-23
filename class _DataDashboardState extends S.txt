@@ -1,0 +1,74 @@
+class _DataDashboardState extends State<DataDashboard> {
+  double temperature = 0.0;
+  double moisture = 0.0;
+  bool isLoading = false;
+  String errorMessage = '';
+
+  Future<void> fetchData() async {
+    setState(() {
+      isLoading = true;
+      errorMessage = ''; // Clear error message before making the request
+      temperature = 0.0; // Reset temperature (optional)
+      moisture = 0.0; // Reset moisture (optional)
+    });
+
+    try {
+      var url = Uri.parse('http://127.0.0.1:3000/latest-data'); // Replace with your actual server URL
+
+      var response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body);
+        setState(() {
+          temperature = double.parse(jsonData['temperature'].toString());
+          moisture = double.parse(jsonData['moisture'].toString());
+        });
+      } else {
+        setState(() {
+          errorMessage = 'Failed to fetch data: ${response.statusCode}';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Error fetching data: $e';
+      });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Data Dashboard'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: fetchData,
+              child: Text('Fetch Data'),
+            ),
+            SizedBox(height: 20),
+            if (isLoading)
+              CircularProgressIndicator()
+            else if (errorMessage.isNotEmpty)
+              Text(errorMessage, style: TextStyle(color: Colors.red)),
+            SizedBox(height: 10),
+            Text('Temperature'),
+            SizedBox(height: 10),
+            CircularProgressIndicatorWidget(value: temperature),
+            SizedBox(height: 20),
+            Text('Moisture'),
+            SizedBox(height: 10),
+            LinearProgressIndicatorWidget(value: moisture),
+          ],
+        ),
+      ),
+    );
+  }
+}
