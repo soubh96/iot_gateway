@@ -18,7 +18,7 @@ app.post('/receive-data', (req, res) => {
     const { mydata } = JSON.parse(objectJSON);
 
     // Extract temperature and moisture from mydata string
-    const [, temperatureStr, moistureStr] = mydata.split('-->');
+    const [, temperatureStr, moistureStr] = mydata.split('--');
 
     // Convert temperature and moisture to numbers
     const temperature = parseFloat(temperatureStr);
