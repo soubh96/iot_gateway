@@ -14,8 +14,9 @@ app.post('/receive-data', (req, res) => {
 
     try {
         // Extract data from the received JSON payload
-        const { objectJSON } = req.body.payload;
-        const { mydata } = JSON.parse(objectJSON);
+        const objectJSON= req.body.objectJSON;
+        const parsedData=JSON.parse(objectJSON)
+        const { mydata } = parsedData;
 
         // Split mydata string by '--' to separate temperature and moisture
         const parts = mydata.split('--');
