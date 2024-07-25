@@ -3,7 +3,6 @@ const bodyParser = require('body-parser');
 const app = express();
 const port = process.env.PORT || 3000;
 
-
 app.use(bodyParser.json());
 
 let latestData = {}; // Store the latest received data
@@ -13,25 +12,46 @@ app.post('/receive-data', (req, res) => {
     console.log('Received data:');
     console.log(req.body);
 
-    // Extract data from the received JSON payload
-    const { objectJSON } = req.body.payload;
-    const { mydata } = JSON.parse(objectJSON);
+    try {
+        // Extract data from the received JSON payload
+        const { objectJSON } = req.body.payload;
+        const { mydata } = JSON.parse(objectJSON);
 
-    // Extract temperature and moisture from mydata string
-    const [, temperatureStr, moistureStr] = mydata.split(':');
+        // Split mydata string by '--' to separate temperature and moisture
+        const parts = mydata.split('--');
 
-    // Convert temperature and moisture to numbers
-    const temperature = parseFloat(temperatureStr);
-    const moisture = parseFloat(moistureStr);
+        // Initialize variables to store temperature and moisture
+        let temperature = NaN;
+        let moisture = NaN;
 
-    // Store the extracted data
-    latestData = {
-        temperature: temperature,
-        moisture: moisture
-    };
-    console.log('stored latest data');
-    console.log(latestData);
-    res.send('Data received successfully');
+        // Iterate over parts to find and extract temperature and moisture values
+        parts.forEach(part => {
+            if (part.includes('TEMPERATURE')) {
+                temperature = parseFloat(part.split(':')[1]);
+            } else if (part.includes('MOISTURE')) {
+                moisture = parseFloat(part.split(':')[1]);
+            }
+        });
+
+        // Validate extracted data
+        if (isNaN(temperature) || isNaN(moisture)) {
+            throw new Error('Invalid temperature or moisture data');
+        }
+
+        // Store the extracted data
+        latestData = {
+            temperature: temperature,
+            moisture: moisture
+        };
+
+        console.log('Stored latest data:');
+        console.log(latestData);
+
+        res.send('Data received successfully');
+    } catch (error) {
+        console.error('Error processing data:', error.message);
+        res.status(400).send('Error processing data');
+    }
 });
 
 // GET endpoint to retrieve latest temperature and moisture data
