@@ -24,6 +24,7 @@ app.post('/receive-data', (req, res) => {
         // Initialize variables to store temperature and moisture
         let temperature = NaN;
         let moisture = NaN;
+        let electricalConductivity=NaN;
 
         // Iterate over parts to find and extract temperature and moisture values
         parts.forEach(part => {
@@ -31,18 +32,21 @@ app.post('/receive-data', (req, res) => {
                 temperature = parseFloat(part.split(':')[1]);
             } else if (part.includes('MOISTURE')) {
                 moisture = parseFloat(part.split(':')[1]);
+            } else if (part.includes('EC')) {
+                electricalConductivity = parseFloat(part.split(':')[1]);
             }
         });
 
         // Validate extracted data
-        if (isNaN(temperature) || isNaN(moisture)) {
-            throw new Error('Invalid temperature or moisture data');
+        if (isNaN(temperature) || isNaN(moisture)|| isNaN(electricalConductivity)) {
+            throw new Error('Invalid temperature,moisture or electricalConductivity data');
         }
 
         // Store the extracted data
         latestData = {
             temperature: temperature,
-            moisture: moisture
+            moisture: moisture,
+            electricalConductivity: electricalConductivity
         };
 
         console.log('Stored latest data:');
@@ -62,7 +66,9 @@ app.get('/latest-data', (req, res) => {
     // Prepare response with only temperature and moisture
     const responseData = {
         temperature: latestData.temperature || 0,
-        moisture: latestData.moisture || 0
+        moisture: latestData.moisture || 0,
+        electricalConductivity: latestData.electricalConductivity || 0
+
     };
 
     res.json(responseData); // Return the latest received data as JSON
