@@ -13,20 +13,18 @@ app.post('/receive-data', (req, res) => {
     console.log(req.body);
 
     try {
-        // Extract data from the received JSON payload
-        const objectJSON= req.body.objectJSON;
-        const parsedData=JSON.parse(objectJSON)
+        const objectJSON = req.body.objectJSON;
+        console.log('Raw objectJSON:', objectJSON);
+        const parsedData = JSON.parse(objectJSON);
         const { mydata } = parsedData;
 
-        // Split mydata string by '--' to separate temperature and moisture
         const parts = mydata.split('--');
+        console.log('Split parts:', parts);
 
-        // Initialize variables to store temperature and moisture
         let temperature = NaN;
         let moisture = NaN;
-        let electricalConductivity=NaN;
+        let electricalConductivity = NaN;
 
-        // Iterate over parts to find and extract temperature and moisture values
         parts.forEach(part => {
             if (part.includes('TEMPERATURE')) {
                 temperature = parseFloat(part.split(':')[1]);
@@ -37,12 +35,14 @@ app.post('/receive-data', (req, res) => {
             }
         });
 
-        // Validate extracted data
-        if (isNaN(temperature) || isNaN(moisture)|| isNaN(electricalConductivity)) {
-            throw new Error('Invalid temperature,moisture or electricalConductivity data');
+        console.log('Extracted temperature:', temperature);
+        console.log('Extracted moisture:', moisture);
+        console.log('Extracted electricalConductivity:', electricalConductivity);
+
+        if (isNaN(temperature) || isNaN(moisture) || isNaN(electricalConductivity)) {
+            throw new Error('Invalid temperature, moisture, or electricalConductivity data');
         }
 
-        // Store the extracted data
         latestData = {
             temperature: temperature,
             moisture: moisture,
@@ -63,18 +63,16 @@ app.post('/receive-data', (req, res) => {
 app.get('/latest-data', (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     
-    // Prepare response with only temperature and moisture
     const responseData = {
         temperature: latestData.temperature || 0,
         moisture: latestData.moisture || 0,
         electricalConductivity: latestData.electricalConductivity || 0
-
     };
 
-    res.json(responseData); // Return the latest received data as JSON
+    res.json(responseData);
 });
 
-// Start the server to listen on all available network interfaces
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
+
