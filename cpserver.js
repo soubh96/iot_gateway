@@ -64,9 +64,9 @@ app.get('/latest-data', (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     
     const responseData = {
-        temperature: latestData.temperature || 23.9,
-        moisture: latestData.moisture || 15.1,
-        electricalConductivity: latestData.electricalConductivity || 51.2
+        temperature: latestData.temperature || 36,
+        moisture: latestData.moisture || 51,
+        electricalConductivity: latestData.electricalConductivity || 102
     };
 
     res.json(responseData);
