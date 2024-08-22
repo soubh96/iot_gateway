@@ -24,30 +24,59 @@ app.post('/receive-data', (req, res) => {
         let temperature = NaN;
         let moisture = NaN;
         let electricalConductivity = NaN;
+        let nitrogen = NaN;
+        let phosphorus = NaN;
+        let potassium = NaN;
 
+        // Check for each data field and update if present
         parts.forEach(part => {
             if (part.includes('TEMPERATURE')) {
                 temperature = parseFloat(part.split(':')[1]);
-            } else if (part.includes('MOISTURE')) {
+            }
+            if (part.includes('MOISTURE')) {
                 moisture = parseFloat(part.split(':')[1]);
-            } else if (part.includes('EC')) {
+            }
+            if (part.includes('EC')) {
                 electricalConductivity = parseFloat(part.split(':')[1]);
+            }
+            if (part.includes('NITROGEN')) {
+                nitrogen = parseFloat(part.split(':')[1]);
+            }
+            if (part.includes('PHOSPHORUS')) {
+                phosphorus = parseFloat(part.split(':')[1]);
+            }
+            if (part.includes('POTASSIUM')) {
+                potassium = parseFloat(part.split(':')[1]);
             }
         });
 
-        console.log('Extracted temperature:', temperature);
-        console.log('Extracted moisture:', moisture);
-        console.log('Extracted electricalConductivity:', electricalConductivity);
+        // Store values only if they are valid numbers
+        let dataToStore = {};
 
-        if (isNaN(temperature) || isNaN(moisture) || isNaN(electricalConductivity)) {
-            throw new Error('Invalid temperature, moisture, or electricalConductivity data');
+        if (!isNaN(temperature)) {
+            dataToStore.temperature = temperature;
+        }
+        if (!isNaN(moisture)) {
+            dataToStore.moisture = moisture;
+        }
+        if (!isNaN(electricalConductivity)) {
+            dataToStore.electricalConductivity = electricalConductivity;
+        }
+        if (!isNaN(nitrogen)) {
+            dataToStore.nitrogen = nitrogen;
+        }
+        if (!isNaN(phosphorus)) {
+            dataToStore.phosphorus = phosphorus;
+        }
+        if (!isNaN(potassium)) {
+            dataToStore.potassium = potassium;
         }
 
-        latestData = {
-            temperature: temperature,
-            moisture: moisture,
-            electricalConductivity: electricalConductivity
-        };
+        if (Object.keys(dataToStore).length === 0) {
+            throw new Error('No valid data to store');
+        }
+
+        latestData = dataToStore;
 
         console.log('Stored latest data:');
         console.log(latestData);
@@ -59,14 +88,17 @@ app.post('/receive-data', (req, res) => {
     }
 });
 
-// GET endpoint to retrieve latest temperature and moisture data
+// GET endpoint to retrieve latest data
 app.get('/latest-data', (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     
     const responseData = {
         temperature: latestData.temperature || 36,
         moisture: latestData.moisture || 51,
-        electricalConductivity: latestData.electricalConductivity || 102
+        electricalConductivity: latestData.electricalConductivity || 102,
+        nitrogen: latestData.nitrogen || 0,
+        phosphorus: latestData.phosphorus || 0,
+        potassium: latestData.potassium || 0
     };
 
     res.json(responseData);
@@ -75,4 +107,3 @@ app.get('/latest-data', (req, res) => {
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
-
