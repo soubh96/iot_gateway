@@ -97,19 +97,25 @@ app.post('/receive-data', (req, res) => {
 });
 
 // GET endpoint to retrieve latest data
-app.get('/latest-data', (req, res) => {
-    res.setHeader('Content-Type', 'application/json');
-    
-    const responseData = {
-        temperature: latestData.temperature || 36,
-        moisture: latestData.moisture || 51,
-        electricalConductivity: latestData.electricalConductivity || 102,
-        nitrogen: latestData.nitrogen || 36,
-        phosphorus: latestData.phosphorus || 51,
-        potassium: latestData.potassium || 102
-    };
+app.get('/latest-data', async (req, res) => {
+    try {
+        const latestData = await Data.findOne().exec();
+        res.setHeader('Content-Type', 'application/json');
+        
+        const responseData = {
+            temperature: latestData?.temperature || 36,
+            moisture: latestData?.moisture || 51,
+            electricalConductivity: latestData?.electricalConductivity || 102,
+            nitrogen: latestData?.nitrogen || 0,
+            phosphorus: latestData?.phosphorus || 0,
+            potassium: latestData?.potassium || 0
+        };
 
-    res.json(responseData);
+        res.json(responseData);
+    } catch (error) {
+        console.error('Error retrieving data:', error.message);
+        res.status(500).send('Error retrieving data');
+    }
 });
 
 app.listen(port, () => {
