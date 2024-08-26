@@ -1,7 +1,14 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose= require('mongoose');
 const app = express();
 const port = process.env.PORT || 3000;
+
+const mongoURI='mongodb+srv://soubhikbaral4:eHBNqrCPu1DGNGdL@cluster0.nwqvj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
+
+mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => console.log('MongoDB connected'))
+    .catch(err => console.error('MongoDB connection error:', err));
 
 app.use(bodyParser.json());
 
@@ -76,6 +83,7 @@ app.post('/receive-data', (req, res) => {
             throw new Error('No valid data to store');
         }
 
+        await Data.findOneAndUpdate({}, dataToStore, { upsert: true, new: true });
         latestData = dataToStore;
 
         console.log('Stored latest data:');
