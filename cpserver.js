@@ -1,26 +1,18 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
-const Data = require('./models/dataModel'); // Import the Data model
 const app = express();
 const port = process.env.PORT || 3000;
-
-const mongoURI = 'mongodb+srv://soubhikbaral4:eHBNqrCPu1DGNGdL@cluster0.nwqvj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-
-mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => console.log('MongoDB connected'))
-    .catch(err => console.error('MongoDB connection error:', err));
 
 app.use(bodyParser.json());
 
 let latestData = {}; // Store the latest received data
 
 // POST endpoint to receive data
-app.post('/receive-data', async (req, res) => {
-    try {
-        console.log('Received data:');
-        console.log(req.body);
+app.post('/receive-data', (req, res) => {
+    console.log('Received data:');
+    console.log(req.body);
 
+    try {
         const objectJSON = req.body.objectJSON;
         console.log('Raw objectJSON:', objectJSON);
         const parsedData = JSON.parse(objectJSON);
@@ -36,6 +28,7 @@ app.post('/receive-data', async (req, res) => {
         let phosphorus = NaN;
         let potassium = NaN;
 
+        // Check for each data field and update if present
         parts.forEach(part => {
             if (part.includes('TEMPERATURE')) {
                 temperature = parseFloat(part.split(':')[1]);
@@ -57,6 +50,7 @@ app.post('/receive-data', async (req, res) => {
             }
         });
 
+        // Store values only if they are valid numbers
         let dataToStore = {};
 
         if (!isNaN(temperature)) {
@@ -82,9 +76,7 @@ app.post('/receive-data', async (req, res) => {
             throw new Error('No valid data to store');
         }
 
-        // Update or insert the data
-        const updatedData = await Data.findOneAndUpdate({}, dataToStore, { upsert: true, new: true });
-        latestData = updatedData;
+        latestData = dataToStore;
 
         console.log('Stored latest data:');
         console.log(latestData);
@@ -97,25 +89,19 @@ app.post('/receive-data', async (req, res) => {
 });
 
 // GET endpoint to retrieve latest data
-app.get('/latest-data', async (req, res) => {
-    try {
-        const latestData = await Data.findOne().exec();
-        res.setHeader('Content-Type', 'application/json');
-        
-        const responseData = {
-            temperature: latestData?.temperature || 36,
-            moisture: latestData?.moisture || 51,
-            electricalConductivity: latestData?.electricalConductivity || 102,
-            nitrogen: latestData?.nitrogen || 0,
-            phosphorus: latestData?.phosphorus || 0,
-            potassium: latestData?.potassium || 0
-        };
+app.get('/latest-data', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    
+    const responseData = {
+        temperature: latestData.temperature || 36,
+        moisture: latestData.moisture || 51,
+        electricalConductivity: latestData.electricalConductivity || 102,
+        nitrogen: latestData.nitrogen || 0,
+        phosphorus: latestData.phosphorus || 0,
+        potassium: latestData.potassium || 0
+    };
 
-        res.json(responseData);
-    } catch (error) {
-        console.error('Error retrieving data:', error.message);
-        res.status(500).send('Error retrieving data');
-    }
+    res.json(responseData);
 });
 
 app.listen(port, () => {
