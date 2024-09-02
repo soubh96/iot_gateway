@@ -96,9 +96,9 @@ app.get('/latest-data', (req, res) => {
         temperature: latestData.temperature || 36,
         moisture: latestData.moisture || 51,
         electricalConductivity: latestData.electricalConductivity || 102,
-        nitrogen: latestData.nitrogen || 0,
-        phosphorus: latestData.phosphorus || 0,
-        potassium: latestData.potassium || 0
+        nitrogen: latestData.nitrogen || 6,
+        phosphorus: latestData.phosphorus || 8,
+        potassium: latestData.potassium || 17
     };
 
     res.json(responseData);
