@@ -30,22 +30,22 @@ app.post('/receive-data', (req, res) => {
 
         // Check for each data field and update if present
         parts.forEach(part => {
-            if (part.includes('TEMPERATURE')) {
+            if (part.includes('T')) {
                 temperature = parseFloat(part.split(':')[1]);
             }
-            if (part.includes('MOISTURE')) {
+            if (part.includes('H')) {
                 moisture = parseFloat(part.split(':')[1]);
             }
             if (part.includes('EC')) {
                 electricalConductivity = parseFloat(part.split(':')[1]);
             }
-            if (part.includes('NITROGEN')) {
+            if (part.includes('N')) {
                 nitrogen = parseFloat(part.split(':')[1]);
             }
-            if (part.includes('PHOSPHORUS')) {
+            if (part.includes('P')) {
                 phosphorus = parseFloat(part.split(':')[1]);
             }
-            if (part.includes('POTASSIUM')) {
+            if (part.includes('K')) {
                 potassium = parseFloat(part.split(':')[1]);
             }
         });
